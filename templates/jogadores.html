@@ -22,13 +22,18 @@
             </div>
             <div class="linha-campos">
                 <div class="campo">
-                    <label for="idade">Idade</label>
-                    <input type="number" id="idade" name="idade" min="0">
+                    <label for="numero_camisa">Número da Camisa</label>
+                    <input type="number" id="numero_camisa" name="numero_camisa" min="0">
                 </div>
                 <div class="campo">
                     <label for="posicao">Posição</label>
-                        TROCAR PARA SELECT OPTION
-                    <input type="text" id="posicao" name="posicao" placeholder="Ex: Atacante">
+                    <select id="posicao" name="posicao">
+                        <option value="">Atacante</option>
+                        <option value="">Meio Campo</option>
+                        <option value="">Lateral</option>
+                        <option value="">Zagueiro</option>
+                        <option value="">Goleiro</option>
+                </select>
                 </div>
             </div>
             <div class="campo">
@@ -36,11 +41,6 @@
                 <select id="time_id" name="time_id">
                     <option value="">Sem time</option>
                 </select>
-            </div>
-            <div class="acoes-form">
-                <button type="submit" class="botao">Cadastrar</button>
-                <a href="{{ url_for('listar_jogadores') }}" class="botao botao-secundario">Cancelar</a>
-            </div>
         </form>
     </section>
     {% endif %}

@@ -27,9 +27,11 @@ def novo_jogador():
 
     if request.method == "POST":
         nome = request.form.get("nome", "").strip()
-        idade = request.form.get("idade") or None
+        numero_camisa = request.form.get("numero_camisa") or None
         posicao = request.form.get("posicao", "").strip()
         time_id = request.form.get("time_id") or None
+
+        if
 
     return render_template("jogadores.html", jogadores=[], times=[])
 
@@ -44,7 +46,9 @@ def novo_time():
 
     if request.method == "POST":
         nome = request.form.get("nome", "").strip()
-        cor = request.form.get("cor", "").strip()
+        turma = request.form.get("turma", "").strip()
+        responsavel = request.form.get("responsavel", "").strip()
+
 
     return render_template("times.html", times=[])
 
@@ -61,10 +65,9 @@ def nova_partida():
     if request.method == "POST":
         time_casa_id = request.form.get("time_casa_id")
         time_visitante_id = request.form.get("time_visitante_id")
-        placar_casa = request.form.get("placar_casa") or 0
-        placar_visitante = request.form.get("placar_visitante") or 0
+        gols_casa = request.form.get("gols_casa") or 0
+        gols_visitante = request.form.get("gols_visitante") or 0
         data_partida = request.form.get("data_partida", "").strip()
-        local = request.form.get("local", "").strip()
 
     return render_template("partidas.html", partidas=[], times=[])
 
