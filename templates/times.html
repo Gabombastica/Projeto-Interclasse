@@ -19,7 +19,7 @@
             <div class="linha-campos">
                 <div class="campo">
                     <label for="nome">Nome do Time *</label>
-                    <input type="text" id="nome" name="nome" required>
+                    <input type="text" id="nome" name="nome">
                 </div>
                 <div class="campo">
                     <label for="turma">Turma</label>
@@ -42,7 +42,24 @@
         <h2>Lista de Times</h2>
         {% if times %}
         <table>
-<!--           Insira sua tabela aqui -->
+            <thead>
+                <tr>
+                    <th> Id </th>
+                    <th> Nome </th>
+                    <th> Turma </th>
+                    <th> Responsável </th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for time in times %}
+                <tr>
+                    <td>{{ time.id }}</td>
+                    <td>{{ time.nome }}</td>
+                    <td>{{ time.turma }}</td>
+                    <td>{{ time.responsavel }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
         </table>
         {% else %}
             <p class="vazio">Nenhum time cadastrado ainda.</p>

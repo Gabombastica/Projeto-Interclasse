@@ -28,19 +28,26 @@
                 <div class="campo">
                     <label for="posicao">Posição</label>
                     <select id="posicao" name="posicao">
-                        <option value="">Atacante</option>
-                        <option value="">Meio Campo</option>
-                        <option value="">Lateral</option>
-                        <option value="">Zagueiro</option>
-                        <option value="">Goleiro</option>
+                        <option value="atacante">Atacante</option>
+                        <option value="meio campo">Meio Campo</option>
+                        <option value="lateral">Lateral</option>
+                        <option value="zagueiro">Zagueiro</option>
+                        <option value="goleiro">Goleiro</option>
                 </select>
                 </div>
             </div>
             <div class="campo">
                 <label for="time_id">Time</label>
                 <select id="time_id" name="time_id">
-                    <option value="">Sem time</option>
+                    {% for time in times %}
+                    <option value="{{ time.id }}">{{ time.nome }}</option>
+                    {% endfor %}
                 </select>
+            </div>
+            <div class="acoes-form">
+                <button type="submit" class="botao">Cadastrar</button>
+                <a href="{{ url_for('listar_partidas') }}" class="botao botao-secundario">Cancelar</a>
+            </div>
         </form>
     </section>
     {% endif %}
@@ -49,7 +56,27 @@
         <h2>Lista de Jogadores</h2>
         {% if jogadores %}
         <table>
-
+            <thead>
+                <tr>
+                    <th> Id </th>
+                    <th> Nome </th>
+                    <th> Número da Camisa </th>
+                    <th> Posição </th>
+                    <th> Time </th>
+                </tr>
+            </thead>
+            <tbody>
+<!-- O for serve para você percorrer uma lista e selecionar coisas específicas dessa lista -->
+            {% for jogador in jogadores %}
+                <tr>
+                    <td>{{ jogador.id }}</td>
+                    <td>{{ jogador.nome }}</td>
+                    <td>{{ jogador.numero_camisa }}</td>
+                    <td>{{ jogador.posicao.capitalize() }}</td>
+                    <td>{{ jogador.time_id }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
         </table>
         {% else %}
             <p class="vazio">Nenhum jogador cadastrado ainda.</p>

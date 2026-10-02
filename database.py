@@ -1,13 +1,14 @@
-import os
 from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, Date
-from sqlalchemy.orm import declarative_base, relationship, sessionmaker
+from sqlalchemy.orm import declarative_base, relationship, sessionmaker, scoped_session
 
 
-engine = create_engine("mysql+pymysql://usuario:senha@localhost:3306/nomedobanco")
+engine = create_engine("mysql+pymysql://root:senaisp@localhost:3306/interclasse_db")
 
-SessionLocal = sessionmaker(bind=engine)
+db_session = scoped_session (sessionmaker(bind=engine))
 
 Base = declarative_base()
+
+# O Banco de Dados é a minha verdade, tudo vai girar em torno dele, não é ele que se adapta, são as informações que se adaptam à ele!
 
 class Time(Base):
     __tablename__ = "times"
