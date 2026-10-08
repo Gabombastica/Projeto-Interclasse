@@ -1,5 +1,5 @@
 from flask import flash
-from sqlalchemy import select
+from sqlalchemy import select, func
 from sqlalchemy.exc import SQLAlchemyError
 
 from database import Partida, db_session
@@ -11,6 +11,13 @@ def select_todas_partidas():
     # 2- Executar o select
     partidas = db_session.execute(partidas_sql).scalars().all()
     return partidas
+
+def select_quantidade_total():
+    partidas_sql = select(func.count(Partida.id))
+    qntd_total = db_session.execute(partidas_sql).scalar()
+    return qntd_total
+
+print(select_quantidade_total())
 
 def salvar(time_casa_id, time_visitante_id, gols_casa, gols_visitante, data_partida):
     # 3- Salvar no banco

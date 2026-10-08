@@ -12,19 +12,18 @@ app.secret_key = "chave-secreta-interclasse-2026"
 @app.route("/")
 def dashboard():
     # Buscar todos os times no banco (Select)
-    times = tabela_time.select_todos_times()
+    times = tabela_time.select_quantidade_total()
 
     # Buscar todos os jogadores no banco (Select)
-    jogadores = tabela_jogador.select_todos_jogadores()
+    jogadores = tabela_jogador.select_quantidade_total()
 
     # Buscar todos as partidas no banco (Select)
-    partidas = tabela_partida.select_todas_partidas()
-
+    partidas = tabela_partida.select_quantidade_total()
     return render_template(
         "dashboard.html",
-        total_jogadores=len(jogadores),
-        total_times=len(times),
-        total_partidas=len(partidas)
+        total_jogadores=jogadores,
+        total_times=times,
+        total_partidas=partidas
     )
 
 
