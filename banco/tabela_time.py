@@ -2,14 +2,19 @@ from flask import flash
 from sqlalchemy import select, func
 from sqlalchemy.exc import SQLAlchemyError
 
-from database import Time, db_session
+from database import Time, db_session, Jogador
+
 
 def select_todos_times():
     # Buscar todos os times no banco
     # 1- Montar o select
-    times_sql = select(Time)
+    times_sql = (
+        select(Time, func.count(Jogador.id).label("jogadores"))
+        .outerjoin(Jogador, Jogador.time_id == Time.id)
+        .group_by(Time.id)
+    )
     # 2- Executar o select
-    times = db_session.execute(times_sql).scalars().all()
+    times = db_session.execute(times_sql).all()
     return times
 
 def select_quantidade_total():

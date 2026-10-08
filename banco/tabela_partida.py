@@ -1,16 +1,26 @@
 from flask import flash
 from sqlalchemy import select, func
 from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import aliased
+from sqlalchemy.sql.elements import or_
 
-from database import Partida, db_session
+from database import db_session, Partida, Time
 
 def select_todas_partidas():
     # Buscar todos os times no banco
     # 1- Montar o select
-    partidas_sql = select(Partida)
+
+    TimeCasa = aliased(Time)
+    TimeVisitante = aliased(Time)
+
+    partidas_sql = (
+        select(Partida, TimeCasa, TimeVisitante)
+        .join(TimeCasa, Partida.time_casa_id == TimeCasa.id)
+        .join(TimeVisitante, Partida.time_visitante_id == TimeVisitante.id)
+    )
     # 2- Executar o select
-    partidas = db_session.execute(partidas_sql).scalars().all()
-    return partidas
+    partidas_casa = db_session.execute(partidas_sql).all()
+    return partidas_casa
 
 def select_quantidade_total():
     partidas_sql = select(func.count(Partida.id))
