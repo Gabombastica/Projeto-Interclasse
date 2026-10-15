@@ -82,9 +82,10 @@ def novo_time():
 
     if request.method == "POST":
         # 1- Pegar os valores digitados no form
-        nome = request.form.get("nome", "").strip()
-        turma = request.form.get("turma", "").strip()
-        responsavel = request.form.get("responsavel", "").strip()
+        nome = request.form.get("nome")
+        turma = request.form.get("turma")
+        responsavel = request.form.get("responsavel")
+        jogadores_ids = request.form.getlist("jogadores")
 
         # 2- Verificar se foi digitado
         if not nome:
@@ -98,19 +99,32 @@ def novo_time():
             return redirect(url_for("novo_time"))
 
         # 3- Salvar no banco
-        tabela_time.salvar(nome=nome, turma=turma, responsavel=responsavel)
+        time = tabela_time.salvar(nome=nome, turma=turma, responsavel=responsavel)
+
+        if jogadores_ids:
+            for jogador_id in jogadores_ids:
+                jogador = tabela_jogador.select_um(jogador_id)
+                jogador.time_id = time.id
+                db_session.add(jogador)
+                db_session.commit()
 
     # Buscar todos os times no banco (Select)
     times = tabela_time.select_todos_times()
-    return render_template("times.html", times=times)
+    jogadores = tabela_jogador.select_todos_jogadores()
+    return render_template("times.html", times=times, jogadores=jogadores)
 
+@app.route("/time/<id_time>")
+def detalhes_time(id_time):
+    time = tabela_time.select_um(int(id_time))
+    jogadores = tabela_jogador.select_jogadores_por_time(int(id_time)) # Fazer uma função que traga todos os jogadores do time
+    partidas = tabela_partida.select_partidas_por_time(int(id_time))
+    return render_template("time_detalhes.html", time=time, jogadores=jogadores, qntd_jogadores=len(jogadores), partidas=partidas, qntd_partidas=len(partidas))
 
 @app.route("/partidas")
 def listar_partidas():
     # Buscar todos as partidas no banco (Select)
     partidas = tabela_partida.select_todas_partidas()
     return render_template("partidas.html", partidas=partidas)
-
 
 @app.route("/partidas/nova", methods=["GET", "POST"])
 def nova_partida():

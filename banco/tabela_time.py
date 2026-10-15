@@ -17,12 +17,14 @@ def select_todos_times():
     times = db_session.execute(times_sql).all()
     return times
 
+
 def select_quantidade_total():
     times_sql = select(func.count(Time.id))
     qntd_total = db_session.execute(times_sql).scalar()
     return qntd_total
 
 print(select_quantidade_total())
+
 
 def salvar(nome, turma, responsavel):
     # 3- Salvar no banco
@@ -31,6 +33,7 @@ def salvar(nome, turma, responsavel):
         db_session.add(novo_time)
         db_session.commit()
         flash("Time criado com sucesso", "success")
+        return novo_time
     except SQLAlchemyError as e:
         db_session.rollback()
         flash("Ocorreu um erro, tente novamente", "error")
@@ -40,3 +43,10 @@ def salvar(nome, turma, responsavel):
         flash("Ocorreu um erro, tente novamente", "error")
         print(f"Erro: {e}")
 
+
+def select_um(id_time):
+    time_sql = select(Time).where(Time.id == id_time)
+    time = db_session.execute(time_sql).scalar_one_or_none()
+    return time
+
+print(select_um(10))
