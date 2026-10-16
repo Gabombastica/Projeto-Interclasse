@@ -108,6 +108,7 @@ def novo_time():
                 db_session.add(jogador)
                 db_session.commit()
 
+
     # Buscar todos os times no banco (Select)
     times = tabela_time.select_todos_times()
     jogadores = tabela_jogador.select_todos_jogadores()
