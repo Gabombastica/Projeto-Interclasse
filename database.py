@@ -1,12 +1,15 @@
-from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, Date
-from sqlalchemy.orm import declarative_base, relationship, sessionmaker, scoped_session
+from xmlrpc.client import DateTime
+from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, Date, DateTime
+from sqlalchemy.orm import declarative_base, relationship, sessionmaker, scoped_session, DeclarativeBase
 
 
 engine = create_engine("mysql+pymysql://root:senaisp@localhost:3306/interclasse_db")
 
 db_session = scoped_session (sessionmaker(bind=engine))
 
-Base = declarative_base()
+# Base = declarative_base()
+class Base(DeclarativeBase):
+    pass
 
 # O Banco de Dados é a minha verdade, tudo vai girar em torno dele, não é ele que se adapta, são as informações que se adaptam à ele!
 
@@ -46,6 +49,16 @@ class Partida(Base):
     gols_visitante = Column(Integer, default=0)
     data_partida = Column(Date)
 
+class Movimentacao(Base):
+    __tablename__ = "movimentacoes"
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    jogador_id = Column(Integer, ForeignKey("jogadores.id", ondelete="SET NULL"))
+    time_origem_id = Column(Integer, ForeignKey("times.id", ondelete="SET NULL"))
+    time_destino_id = Column(Integer, ForeignKey("times.id", ondelete="SET NULL"))
+    data_movimentacao = Column(DateTime)
+
+    def __repr__(self):
+        return f"<Movimentacao {self.jogador_id}>"
 
 if __name__ == "__main__":
     Base.metadata.create_all(bind=engine)
