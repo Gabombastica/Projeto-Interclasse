@@ -4,10 +4,46 @@ from sqlalchemy.exc import SQLAlchemyError
 from banco import tabela_time, tabela_jogador, tabela_partida, tabela_movimentacao
 from database import *
 from datetime import datetime
+from flask_login import LoginManager, login_user, logout_user, current_user, login_required
 
 app = Flask(__name__)
+# secret_key aqui apenas em momento de criação, em produção deve ser protegida!
 app.secret_key = "chave-secreta-interclasse-2026"
 
+# Configuração do Flask-Login
+login_manager = LoginManager(app)
+login_manager.login_view = "login"
+login_manager.login_message = "Faça login para acessar"
+
+# Prevenir gargalo "too many connections"
+@app.teardown_appcontext
+def shutdown_session(exception=None):
+    db_session.remove()
+
+# Carregar informações do usuário logado
+@login_manager.user_loader
+def load_user(user_id):
+    return db_session.get(Usuario, int(user_id))
+
+# Interface de autenticação
+@app.route('/login', methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        email = request.form.get("email")
+        senha = request.form.get("senha")
+
+
+        usuario_sql = select(Usuario).where(Usuario.email == email)
+        usuario_resultado = db_session.execute(usuario_sql).scalar() # usuario_resultado representa a class Usuario
+
+        if not usuario_resultado:
+            flash("Falha na autenticação: E-mail não encontrado", "error")
+            return redirect(url_for("login"))
+        if usuario_resultado and usuario_resultado.check_password(senha):
+            login_user(usuario_resultado)
+            return redirect(url_for("dashboard"))
+        else:
+            flash("Falha na autenticação: Senha incorreta", "error")
 
 @app.route("/")
 def dashboard():
@@ -19,11 +55,16 @@ def dashboard():
 
     # Buscar todos as partidas no banco (Select)
     partidas = tabela_partida.select_quantidade_total()
+
+    # Buscar todos as movimentações no banco (Select)
+    movimentacoes = tabela_movimentacao.select_quantidade_total()
+
     return render_template(
         "dashboard.html",
         total_jogadores=jogadores,
         total_times=times,
-        total_partidas=partidas
+        total_partidas=partidas,
+        total_movimentacoes=movimentacoes
     )
 
 
@@ -209,9 +250,9 @@ def nova_partida():
     partidas = tabela_partida.select_todas_partidas()
     return render_template("partidas.html", partidas=partidas, times=times)
 
-@app.route("/movimentacao/nova/id<int:jogador_id>")
+@app.route("/movimentacao/nova/id<int:id_jogador>")
 @app.route("/movimentacao/nova", methods=["GET", "POST"])
-def nova_movimentacao(jogador_id=None):
+def nova_movimentacao(id_jogador=None):
     if request.method == "POST":
         # 1- Pegar informações do Formulário (POST)
         jogador_id = request.form.get("jogador_id")
@@ -229,16 +270,16 @@ def nova_movimentacao(jogador_id=None):
         tabela_movimentacao.salvar(jogador_id, time_destino_id)
         return redirect(url_for("nova_movimentacao"))
     # Carregar dados para movimentação
-    movimentacao = tabela_movimentacao.select_todos()
+    movimentacoes = tabela_movimentacao.select_todos()
     jogadores = tabela_jogador.select_todos_jogadores()
     times = tabela_time.select_todos_times()
 
     return render_template(
         "movimentacoes.html",
-        movimentacoes=movimentacao,
+        movimentacoes=movimentacoes,
         jogadores=jogadores,
         times=times,
-        jogador_selecionado=jogador_id
+        jogador_selecionado_id=id_jogador
     )
 
 if __name__ == "__main__":
