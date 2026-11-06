@@ -45,7 +45,50 @@ def login():
         else:
             flash("Falha na autenticação: Senha incorreta", "error")
 
+    return render_template(
+        "login.html",
+        registro=request.args.get("registro") == 'True'
+    )
+
+@app.route('/registro', methods=["GET", "POST"])
+def registro():
+    if request.method == "POST":
+        nome = request.form.get("nome")
+        email = request.form.get("email")
+        senha = request.form.get("senha")
+
+        if not nome and not email and not senha:
+            flash("Preencher todos os campos", "error")
+            return redirect(url_for("registro"))
+
+        usuario_sql = select(Usuario).where(Usuario.email == email)
+        usuario_email = db_session.execute(usuario_sql).scalar_one_or_none()
+
+        if usuario_email:
+            flash("E-mail já cadastrado", "error")
+            return redirect(url_for("registro"))
+        try:
+            novo_usuario = Usuario(
+                nome=nome,
+                email=email
+            )
+
+            novo_usuario.set_password(senha)
+            db_session.add(novo_usuario)
+            db_session.commit()
+            flash("Usuário cadastrado com sucesso", "success")
+            return redirect(url_for("login"))
+        except SQLAlchemyError as e:
+            print(f"SQLAlchemyError: {e}")
+            flash(f"Erro no banco")
+            return redirect(url_for("registro"))
+        except Exception as e:
+            print(f"Erro ao registrar: {e}")
+            flash(f"Erro ao registrar", "error")
+            return redirect(url_for("registro"))
+    return render_template("login.html")
 @app.route("/")
+@login_required
 def dashboard():
     # Buscar todos os times no banco (Select)
     times = tabela_time.select_quantidade_total()
